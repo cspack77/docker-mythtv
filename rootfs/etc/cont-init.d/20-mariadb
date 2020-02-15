@@ -1,0 +1,48 @@
+#!/usr/bin/with-contenv bash
+
+main() {
+    
+    if [ $CONFIG_MODE = 1 ]; then
+        create_mythdb
+    else
+        echo "=> Started in run mode, skipping database creation"
+    fi
+}
+
+create_mythdb() {
+    mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} -e "status" 2>&1
+    RET=$?
+    if [ $RET = 0 ]; then
+        RESULT=$(mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} -ss -N -e "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'mythconverg';")
+        if [ "$RESULT" != "mythconverg" ]; then
+    
+            echo "=> Creating MythTV database"
+            mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} \
+              -e "CREATE DATABASE IF NOT EXISTS mythconverg"
+            mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} \
+              -e "CREATE USER 'mythtv'@'localhost' IDENTIFIED BY 'mythtv'"
+            mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} \
+              -e "GRANT ALL ON mythconverg.* TO 'mythtv'@'localhost' IDENTIFIED BY 'mythtv'"
+            mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} \
+              -e "GRANT CREATE TEMPORARY TABLES ON mythconverg.* TO 'mythtv'@'localhost' IDENTIFIED BY 'mythtv'"
+            mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} \
+              -e "CREATE USER 'mythtv' IDENTIFIED BY 'mythtv'"
+            mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} \
+              -e "GRANT ALL ON mythconverg.* TO 'mythtv' IDENTIFIED BY 'mythtv'"
+            mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} \
+              -e "GRANT CREATE TEMPORARY TABLES ON mythconverg.* TO 'mythtv' IDENTIFIED BY 'mythtv'"
+            mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} \
+              -e "ALTER DATABASE mythconverg DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
+            
+            echo "=> MythTV Database created"
+    
+            mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -uroot -p${MYSQL_ROOT_PASSWORD} -h ${MYSQL_HOST} mysql
+        else
+            echo "=> Mythtv database already exists, skipping creation"
+        fi
+    else
+        echo "=> ERROR: Mysql database at ${MYSQL_HOST} not available"
+    fi
+}
+
+main
