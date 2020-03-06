@@ -37,7 +37,7 @@ RUN apt-key adv --recv-keys --keyserver \
 		-o Dpkg::Options::="--force-confold" \
 	\
 	&& apt-get install -y mariadb-server apt-utils curl tzdata lsb-release  \
-		git x11vnc xvfb mate-desktop-environment-core net-tools \
+		git x11vnc xvfb mate-desktop-environment-core net-tools inetutils-ping \
 	\
 	&& apt-get install -y  \
 		mythtv-backend mythweb xmltv xmltv-util \
