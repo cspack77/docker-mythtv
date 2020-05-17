@@ -1,5 +1,4 @@
 # Docker container for MythTV Backend
-[![Docker Automated build](https://img.shields.io/docker/automated/sammonsjl/mythtv.svg)](https://hub.docker.com/r/sammonsjl/mythtv/) [![Docker Image](https://images.microbadger.com/badges/image/sammonsjl/mythtv.svg)](https://microbadger.com/images/sammonsjl/mythtv) [![Build Status](https://travis-ci.org/sammonsjl/docker-mythtv.svg?branch=master)](https://travis-ci.org/sammonsjl/docker-mythtv)
 
 This is a Docker container for MythTV Backend.
 
