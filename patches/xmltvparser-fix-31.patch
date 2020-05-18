@@ -1,0 +1,81 @@
+diff --git a/mythtv/programs/mythfilldatabase/xmltvparser.cpp b/mythtv/programs/mythfilldatabase/xmltvparser.cpp
+index a875020462..7eacda8d5f 100644
+--- a/mythtv/programs/mythfilldatabase/xmltvparser.cpp
++++ b/mythtv/programs/mythfilldatabase/xmltvparser.cpp
+@@ -711,45 +711,39 @@ bool XMLTVParser::parseFile(
+                         last_channel = pginfo->m_channel;
+                         last_starttime = QDateTime(QDate(1970, 1, 1), QTime(0, 0, 0)); //initialize it to a time far, far away ...
+                     }
+-                    else {
+-                        //we are still on the same channel
+-                        if (pginfo->m_starttime >= last_starttime) {
+-                            last_starttime = pginfo->m_starttime;
+-                        }
+-                        else {
+-                            LOG(VB_GENERAL, LOG_ERR, QString("Malformed XML file, program out of order at line %1, %2").arg(xml.lineNumber()).arg(xml.errorString()));
+-                            delete pginfo;
+-                            return false;
+-                        }
++                    if (pginfo->m_starttime < last_starttime) {
++                        LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme, out of order (%1) Channel (%2), Start time (%3), skipping").arg(pginfo->m_title).arg(pginfo->m_channel).arg(pginfo->m_starttime.toString("yyyy-MM-dd HH:mm:ss")));
+                     }
+-
+-                    if (pginfo->m_clumpidx.isEmpty())
+-                        (*proglist)[pginfo->m_channel].push_back(*pginfo);
+-                    else
+-                    {
+-                        /* append all titles/descriptions from one clump */
+-                        if (pginfo->m_clumpidx.toInt() == 0)
+-                        {
+-                            aggregatedTitle.clear();
+-                            aggregatedDesc.clear();
+-                        }
+-                        if (!pginfo->m_title.isEmpty())
+-                        {
+-                            if (!aggregatedTitle.isEmpty())
+-                                aggregatedTitle.append(" | ");
+-                            aggregatedTitle.append(pginfo->m_title);
+-                        }
+-                        if (!pginfo->m_description.isEmpty())
+-                        {
+-                            if (!aggregatedDesc.isEmpty())
+-                                aggregatedDesc.append(" | ");
+-                            aggregatedDesc.append(pginfo->m_description);
+-                        }
+-                        if (pginfo->m_clumpidx.toInt() == pginfo->m_clumpmax.toInt() - 1)
+-                        {
+-                            pginfo->m_title = aggregatedTitle;
+-                            pginfo->m_description = aggregatedDesc;
++                    else {
++                        last_starttime = pginfo->m_starttime;
++                        if (pginfo->m_clumpidx.isEmpty())
+                             (*proglist)[pginfo->m_channel].push_back(*pginfo);
++                        else
++                        {
++                            /* append all titles/descriptions from one clump */
++                            if (pginfo->m_clumpidx.toInt() == 0)
++                            {
++                                aggregatedTitle.clear();
++                                aggregatedDesc.clear();
++                            }
++                            if (!pginfo->m_title.isEmpty())
++                            {
++                                if (!aggregatedTitle.isEmpty())
++                                    aggregatedTitle.append(" | ");
++                                aggregatedTitle.append(pginfo->m_title);
++                            }
++                            if (!pginfo->m_description.isEmpty())
++                            {
++                                if (!aggregatedDesc.isEmpty())
++                                    aggregatedDesc.append(" | ");
++                                aggregatedDesc.append(pginfo->m_description);
++                            }
++                            if (pginfo->m_clumpidx.toInt() == pginfo->m_clumpmax.toInt() - 1)
++                            {
++                                pginfo->m_title = aggregatedTitle;
++                                pginfo->m_description = aggregatedDesc;
++                                (*proglist)[pginfo->m_channel].push_back(*pginfo);
++                            }
+                         }
+                     }
+                 }
