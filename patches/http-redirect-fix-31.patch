@@ -1,0 +1,32 @@
+diff --git a/mythtv/libs/libmythtv/recorders/httptsstreamhandler.cpp b/mythtv/libs/libmythtv/recorders/httptsstreamhandler.cpp
+index 56a5f4f8a0..105464482b 100644
+--- a/mythtv/libs/libmythtv/recorders/httptsstreamhandler.cpp
++++ b/mythtv/libs/libmythtv/recorders/httptsstreamhandler.cpp
+@@ -147,7 +147,14 @@ bool HTTPReader::DownloadStream(const QUrl& url)
+ 
+     // the HTTP request
+     m_replylock.lock();
+-    m_reply = m_mgr.get(QNetworkRequest(url));
++    //m_reply = m_mgr.get(QNetworkRequest(url));
++    m_req = QNetworkRequest(url);
++    m_req.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
++    m_req.setRawHeader("User-Agent", "Kodi/16.0 (X11; Linux x86_64) Fedora/23 App_Bitness/64 Version/16.0-Git:Unknown");
++    m_req.setRawHeader("Accept", "*/*");
++    m_req.setRawHeader("Accept-Charset", "UTF-8,*;q=0.8");
++    m_req.setRawHeader("Connection", "close");
++    m_reply = m_mgr.get(m_req); 
+     m_replylock.unlock();
+ 
+     connect(&m_timer, SIGNAL(timeout()), &event_loop, SLOT(quit()));
+diff --git a/mythtv/libs/libmythtv/recorders/httptsstreamhandler.h b/mythtv/libs/libmythtv/recorders/httptsstreamhandler.h
+index 036848bfda..c6e38e13f8 100644
+--- a/mythtv/libs/libmythtv/recorders/httptsstreamhandler.h
++++ b/mythtv/libs/libmythtv/recorders/httptsstreamhandler.h
+@@ -59,6 +59,7 @@ class MTV_PUBLIC HTTPReader : public QObject
+     HTTPTSStreamHandler    *m_parent     {nullptr};
+     QTimer                  m_timer;
+     QNetworkAccessManager   m_mgr;
++    QNetworkRequest         m_req;
+     QNetworkReply          *m_reply      {nullptr};
+     QMutex                  m_lock;
+     QMutex                  m_replylock;

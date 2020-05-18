@@ -42,8 +42,8 @@ RUN apt-key adv --recv-keys --keyserver \
 	&& apt-get install -y  \
 		mythtv-backend mythweb xmltv xmltv-util \
 	\
-	&& wget https://nice.net.nz/scripts/tv_grab_nz-py -O /usr/bin/tv_grab_nz-py \
-	&& chmod a+x /usr/bin/tv_grab_nz-py \
+	&& wget https://github.com/garybuhrmaster/tv_grab_zz_sdjson_sqlite/raw/master/tv_grab_zz_sdjson_sqlite -O /usr/bin/tv_grab_zz_sdjson_sqlite \
+	&& chmod a+x /usr/bin/tv_grab_zz_sdjson_sqlite \
 	\
 	&& cd /opt && git clone https://github.com/kanaka/noVNC.git \
 	&& cd noVNC/utils && git clone \
